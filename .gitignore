@@ -1,0 +1,6 @@
+**/.DS_Store
+/dataset-generation-tool/backup/
+/dataset-generation-tool/models/
+/dataset-generation-tool/features/
+/dataset-generation-tool/gallery/
+/dataset-generation-tool/results/
