@@ -1,0 +1,3 @@
+[submodule "dataset-generation-tool/onnx-modifier"]
+	path = dataset-generation-tool/onnx-modifier
+	url = https://github.com/M1keZulu/onnx-modifier.git
