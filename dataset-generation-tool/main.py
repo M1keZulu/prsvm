@@ -114,6 +114,7 @@ def searchFeatures(compare_image_path, feature_folder_path, gallery_folder_path,
             image = cv2.imread(image_path)
             #filename should contain video name, frame number, and detection number
             cv2.imwrite("results/" + filename + ".png", image)
+            np.save("results/" + filename, feature)
     pbar.close()
 
 
@@ -241,6 +242,8 @@ if __name__ == '__main__':
     reid_model_bin = "./models/person-reidentification-retail-0277/FP16/person-reidentification-retail-0277.bin"
 
     ie = IECore()
+
+    print(ie.available_devices)
 
     det_net = ie.read_network(model=detection_model_xml, weights=detection_model_bin)
     det_inputs = det_net.input_info
