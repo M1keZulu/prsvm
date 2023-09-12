@@ -56,7 +56,7 @@ def saveFeatures(video_folder_path):
                         feature_result = reid_exec_net.infer(inputs={reid_input_name: cropped})
                         feature = feature_result[reid_output_name]
                         #filename should contain video name, frame number, and detection number
-                        filename = video + "_" + str(int(cap.get(cv2.CAP_PROP_POS_FRAMES))) + "_" + str(uuid.uuid4())
+                        filename = video.split('.')[0] + "_" + str(int(cap.get(cv2.CAP_PROP_POS_FRAMES))) + "_" + str(uuid.uuid4())
                         np.save("features/" + filename, feature)
                         cv2.imwrite("gallery/" + filename + ".png", cropped.transpose((1, 2, 0)))
         pbar.close()
@@ -164,6 +164,7 @@ def createClusters(feature_folder_path, gallery_folder_path, cluster_size=10):
         if not os.path.exists("clusters/" + str(kmeans.labels_[i])):
             os.makedirs("clusters/" + str(kmeans.labels_[i]))
         cv2.imwrite("clusters/" + str(kmeans.labels_[i]) + "/" + filename + ".png", image)
+        np.save("clusters/" + str(kmeans.labels_[i]) + "/" + filename, features[i])
 
 
 def searchQuery(compare_image_path, video_folder_path, threshold=0.5):
@@ -229,7 +230,7 @@ def searchQuery(compare_image_path, video_folder_path, threshold=0.5):
                         feature = feature_result[reid_output_name]
                         similarity = cosine_similarity(feature, compare_feature)
                         if similarity > threshold:
-                            cv2.imwrite("results/" + video + "_" + str(int(cap.get(cv2.CAP_PROP_POS_FRAMES))) + "_" + str(uuid.uuid4()) + ".png", cropped.transpose((1, 2, 0)))
+                            cv2.imwrite("results/" + video.split('.')[0] + "_" + str(int(cap.get(cv2.CAP_PROP_POS_FRAMES))) + "_" + str(uuid.uuid4()) + ".png", cropped.transpose((1, 2, 0)))
         pbar.close()                            
             
 
@@ -264,5 +265,5 @@ if __name__ == '__main__':
     #Example usage
     #searchQuery("/Users/zain/Desktop/Screenshots/Screenshot 2023-06-16 at 7.25.22 AM.png", "/Users/zain/Desktop/PersonReID_Prototype/campus_videos")
     #saveFeatures("/Users/zain/Desktop/PersonReID_Prototype/campus_videos")
-    #searchFeatures("/Users/zain/Desktop/Screenshots/Screenshot 2023-06-16 at 7.25.22 AM.png", "/Users/zain/Downloads/Person_ReID_Testing/features", "/Users/zain/Downloads/Person_ReID_Testing/gallery")
-    #createClusters("/Users/zain/Downloads/Person_ReID_Testing/features", "/Users/zain/Downloads/Person_ReID_Testing/gallery", 10)
+    #searchFeatures("/Users/zain/Desktop/Screenshots/Screenshot 2023-06-16 at 7.25.22 AM.png", "/Users/zain/prsvm/dataset-generation-tool/features", "/Users/zain/prsvm/dataset-generation-tool/gallery")
+    #createClusters("./features", "./gallery", 10)
