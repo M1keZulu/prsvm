@@ -6,3 +6,4 @@
 /dataset-generation-tool/results/
 /dataset-generation-tool/clusters/
 **/env/
+/serviceAccount.json
