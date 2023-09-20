@@ -1,8 +1,6 @@
 name: prsvm-ml-backend-tests
 on:
   pull_request:
-    branches:
-      - main
     paths:
       - 'ml-backend/data/**'
       - 'ml-backend/models/**'
