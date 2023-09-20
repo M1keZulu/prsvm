@@ -35,6 +35,7 @@ def main():
     if not os.path.exists(features_path):
         os.makedirs(features_path)
 
+    #extract features from images
     for folder in os.listdir(data_path):
         if os.path.isdir(os.path.join(data_path, folder)):
             if not os.path.exists(os.path.join(features_path, folder)):
