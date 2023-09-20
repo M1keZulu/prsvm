@@ -39,7 +39,7 @@ def main():
     for folder in os.listdir(data_path):
         if os.path.isdir(os.path.join(data_path, folder)):
             if not os.path.exists(os.path.join(features_path, folder)):
-                os.makedirs(os.path.join('features', folder))
+                os.makedirs(os.path.join(features_path, folder))
             pbar = tqdm.tqdm(total=len(os.listdir(os.path.join(data_path, folder))), desc=folder)
             for file in os.listdir(os.path.join(data_path, folder)):
                 if file.split('.')[1] not in ['png', 'jpg', 'jpeg']:
@@ -138,6 +138,8 @@ def main():
             if labels[rank[i]] == labels[feature]:
                 correct += 1
                 ap += correct / (i+1)
+        if correct == 0:
+            continue
         ap /= correct
         mean_average_precision += ap
 
