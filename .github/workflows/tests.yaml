@@ -8,7 +8,7 @@ on:
       - 'ml-backend/models/**'
       - 'ml-backend/tests/**'
 jobs:
-  train-and-report:
+  model_test:
     runs-on: ubuntu-latest
     container: dvcorg/cml:latest
     steps:
