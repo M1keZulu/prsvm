@@ -18,7 +18,7 @@ def main():
     logging.info("Features path: " + features_path)
 
     for file in os.listdir(data_path + '/query/'):
-        if file.split('.')[1] not in ['png', 'jpg', 'jpeg']:
+        if not file.endswith('.jpg') and not file.endswith('.png') and not file.endswith('.jpeg'):
             continue
         os.rename(data_path + '/query/' + file, data_path + '/gallery/' + file.split('.')[0] + '_query.jpg')
 
@@ -42,7 +42,7 @@ def main():
                 os.makedirs(os.path.join(features_path, folder))
             pbar = tqdm.tqdm(total=len(os.listdir(os.path.join(data_path, folder))), desc=folder)
             for file in os.listdir(os.path.join(data_path, folder)):
-                if file.split('.')[1] not in ['png', 'jpg', 'jpeg']:
+                if not file.endswith('.jpg') and not file.endswith('.png') and not file.endswith('.jpeg'):
                     continue
                 image_path = os.path.join(data_path, folder, file)
                 image = cv2.imread(image_path)
@@ -158,4 +158,3 @@ if __name__ == '__main__':
     logger.setLevel(logging.INFO)
     main()
 
-    
