@@ -1,8 +1,12 @@
 name: prsvm-ml-backend-tests
-on: [pull_request]
-  paths:
-    - 'ml-backend/data/**'
-    - 'ml-backend/models/**'
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'ml-backend/data/**'
+      - 'ml-backend/models/**'
+      - 'ml-backend/tests/**'
 jobs:
   train-and-report:
     runs-on: ubuntu-latest
