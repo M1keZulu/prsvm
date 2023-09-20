@@ -24,7 +24,6 @@ jobs:
           dvc pull
 
           unzip -o ml-backend/data/data.zip -d ml-backend/data/
-          unzip -o ml-backend/models/models.zip -d ml-backend/models/
 
           dvc repro
           git fetch --prune

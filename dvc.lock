@@ -5,14 +5,14 @@ stages:
     deps:
     - path: ml-backend/data
       hash: md5
-      md5: b7ce1fcc32c898a11a5e34e00677f3d2.dir
-      size: 14340
-      nfiles: 1
+      md5: 198ef09d013ce08954e4828c2396318d.dir
+      size: 63271329
+      nfiles: 2
     - path: ml-backend/models
       hash: md5
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: 6a11d36087de961a4e2c385b1227f10c.dir
+      size: 446288213
+      nfiles: 1
     - path: ml-backend/tests/metrics.py
       hash: md5
       md5: 1569baf1ecfd3f421a7f1ecc8cd1d24f
