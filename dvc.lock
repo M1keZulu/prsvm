@@ -15,8 +15,8 @@ stages:
       nfiles: 1
     - path: ml-backend/tests/metrics.py
       hash: md5
-      md5: 1569baf1ecfd3f421a7f1ecc8cd1d24f
-      size: 6187
+      md5: 183bf5cf522effc0d244c3b105c3d8de
+      size: 6221
     outs:
     - path: metrics.json
       hash: md5
