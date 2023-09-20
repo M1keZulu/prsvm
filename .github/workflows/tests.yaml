@@ -23,6 +23,7 @@ jobs:
         run: |
           git config --global --add safe.directory '*'
 
+          apt-get update && apt-get install libgl1
           pip install -r test_requirements.txt
 
           dvc pull
