@@ -1,0 +1,24 @@
+schema: '2.0'
+stages:
+  model_test:
+    cmd: python ml-backend/tests/metrics.py
+    deps:
+    - path: ml-backend/data
+      hash: md5
+      md5: b7ce1fcc32c898a11a5e34e00677f3d2.dir
+      size: 14340
+      nfiles: 1
+    - path: ml-backend/models
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: ml-backend/tests/metrics.py
+      hash: md5
+      md5: 1569baf1ecfd3f421a7f1ecc8cd1d24f
+      size: 6187
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0

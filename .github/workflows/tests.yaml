@@ -1,0 +1,33 @@
+name: prsvm-ml-backend-tests
+on: [pull_request]
+paths:
+  - 'ml-backend/data/**'
+  - 'ml-backend/models/**'
+jobs:
+  train-and-report:
+    runs-on: ubuntu-latest
+    container: dvcorg/cml:latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: iterative/setup-dvc@v1
+        with:
+          version: '3.19.0'
+      - name: Model Test
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.ORIGINAL_SERVICE_ACCOUNT_JSON }}
+        run: |
+          git config --global --add safe.directory '*'
+
+          pip install -r test_requirements.txt
+
+          dvc pull
+
+          unzip -o ml-backend/data/data.zip -d ml-backend/data/
+          unzip -o ml-backend/models/models.zip -d ml-backend/models/
+
+          dvc repro
+          git fetch --prune
+          dvc metrics diff --md > report.md
+
+          cml comment create report.md

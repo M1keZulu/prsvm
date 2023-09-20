@@ -6,4 +6,6 @@
 /dataset-generation-tool/results/
 /dataset-generation-tool/clusters/
 **/env/
+**/test_env/
+/ml-backend/tests/features/
 /serviceAccount.json

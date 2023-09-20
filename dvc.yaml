@@ -1,0 +1,10 @@
+stages:
+  model_test:
+    cmd: python ml-backend/tests/metrics.py
+    deps:
+    - ml-backend/tests/metrics.py
+    - ml-backend/data
+    - ml-backend/models
+    metrics:
+    - metrics.json:
+        cache: false
