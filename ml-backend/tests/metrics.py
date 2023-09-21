@@ -84,7 +84,9 @@ def main():
     mean_average_precision = 0
     queries = 0
 
-    random_nums = [np.random.randint(0, len(features)) for i in range(2)]
+    #2 random nums in list where query in features
+    random_nums = np.random.choice(np.where(np.char.endswith(name, 'query'))[0], 2, replace=False)
+    random_nums = random_nums.tolist()
 
     for feature in range(len(features)):
         if "query" not in name[feature]:
