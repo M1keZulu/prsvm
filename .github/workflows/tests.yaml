@@ -32,9 +32,9 @@ jobs:
 
           dvc repro
           git fetch --prune
-          echo '## Model Test' > report.md
-          dvc metrics diff --md > report.md
-          echo '## Examples' > report.md
+          echo '## Model Test' >> report.md
+          dvc metrics diff --md >> report.md
+          echo '## Examples' >> report.md
           echo '![](./example_0.png "Example #1")' >> report.md
           echo '![](./example_1.png "Example #2")' >> report.md
 
