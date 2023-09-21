@@ -1,10 +1,14 @@
 name: prsvm-ml-backend-tests
-on: [pull_request]
-paths:
-  - 'ml-backend/data/**'
-  - 'ml-backend/models/**'
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'ml-backend/data/**'
+      - 'ml-backend/models/**'
+      - 'ml-backend/tests/**'
 jobs:
-  train-and-report:
+  model_test:
     runs-on: ubuntu-latest
     container: dvcorg/cml:latest
     steps:
@@ -19,15 +23,19 @@ jobs:
         run: |
           git config --global --add safe.directory '*'
 
+          apt-get update && apt-get install libgl1
           pip install -r test_requirements.txt
 
           dvc pull
 
           unzip -o ml-backend/data/data.zip -d ml-backend/data/
-          unzip -o ml-backend/models/models.zip -d ml-backend/models/
 
           dvc repro
           git fetch --prune
-          dvc metrics diff --md > report.md
+          echo '## Model Test' >> report.md
+          dvc metrics diff --md >> report.md
+          echo '## Examples' >> report.md
+          echo '![](./example_0.png "Example #1")' >> report.md
+          echo '![](./example_1.png "Example #2")' >> report.md
 
           cml comment create report.md

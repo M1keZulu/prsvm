@@ -18,7 +18,7 @@ def main():
     logging.info("Features path: " + features_path)
 
     for file in os.listdir(data_path + '/query/'):
-        if file.split('.')[1] not in ['png', 'jpg', 'jpeg']:
+        if not file.endswith('.jpg') and not file.endswith('.png') and not file.endswith('.jpeg'):
             continue
         os.rename(data_path + '/query/' + file, data_path + '/gallery/' + file.split('.')[0] + '_query.jpg')
 
@@ -35,13 +35,14 @@ def main():
     if not os.path.exists(features_path):
         os.makedirs(features_path)
 
+    #extract features from images
     for folder in os.listdir(data_path):
         if os.path.isdir(os.path.join(data_path, folder)):
             if not os.path.exists(os.path.join(features_path, folder)):
-                os.makedirs(os.path.join('features', folder))
+                os.makedirs(os.path.join(features_path, folder))
             pbar = tqdm.tqdm(total=len(os.listdir(os.path.join(data_path, folder))), desc=folder)
             for file in os.listdir(os.path.join(data_path, folder)):
-                if file.split('.')[1] not in ['png', 'jpg', 'jpeg']:
+                if not file.endswith('.jpg') and not file.endswith('.png') and not file.endswith('.jpeg'):
                     continue
                 image_path = os.path.join(data_path, folder, file)
                 image = cv2.imread(image_path)
@@ -83,6 +84,10 @@ def main():
     mean_average_precision = 0
     queries = 0
 
+    #2 random nums in list where query in features
+    random_nums = np.random.choice(np.where(np.char.endswith(name, 'query'))[0], 2, replace=False)
+    random_nums = random_nums.tolist()
+
     for feature in range(len(features)):
         if "query" not in name[feature]:
             continue
@@ -100,24 +105,25 @@ def main():
         keep = np.invert(np.char.startswith(name[rank], q_pid + '_' + q_camid))
         rank = rank[keep]
 
-        # #plot original image and top 10 similar images
-        # plt.figure(figsize=(20, 10))
-        # plt.subplot(1, 11, 1)
-        # plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/", name[feature] + '.jpg')), cv2.COLOR_BGR2RGB))
-        # plt.title("Query")
-        # print("Query: " + name[feature] + " Label: " + labels[feature])
-        # plt.axis('off')
-        # for i in range(10):
-        #     plt.subplot(1, 11, i+2)
-        #     plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/" , name[rank[i]] + '.jpg')), cv2.COLOR_BGR2RGB))
-        #     plt.axis('off')
-        #     print("Rank " + str(i+1) + ": " + name[rank[i]] + " Label: " + labels[rank[i]])
-        #     #color the correct rank
-        #     if labels[feature] == labels[rank[i]]:
-        #         plt.title("Rank " + str(i+1), color='green')
-        #     else:
-        #         plt.title("Rank " + str(i+1), color='red')
-        # plt.show()
+        if feature in random_nums:
+            #plot original image and top 10 similar images
+            plt.figure(figsize=(20, 10))
+            plt.subplot(1, 11, 1)
+            plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/", name[feature] + '.jpg')), cv2.COLOR_BGR2RGB))
+            plt.title("Query")
+            print("Query: " + name[feature] + " Label: " + labels[feature])
+            plt.axis('off')
+            for i in range(10):
+                plt.subplot(1, 11, i+2)
+                plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/" , name[rank[i]] + '.jpg')), cv2.COLOR_BGR2RGB))
+                plt.axis('off')
+                print("Rank " + str(i+1) + ": " + name[rank[i]] + " Label: " + labels[rank[i]])
+                #color the correct rank
+                if labels[feature] == labels[rank[i]]:
+                    plt.title("Rank " + str(i+1), color='green')
+                else:
+                    plt.title("Rank " + str(i+1), color='red')
+            plt.savefig('example_' + str(random_nums.index(feature)) + '.png')
 
         #calculate rank 1, 5, 10 accuracy
         rank_1 = rank[0:1]
@@ -137,6 +143,8 @@ def main():
             if labels[rank[i]] == labels[feature]:
                 correct += 1
                 ap += correct / (i+1)
+        if correct == 0:
+            continue
         ap /= correct
         mean_average_precision += ap
 
