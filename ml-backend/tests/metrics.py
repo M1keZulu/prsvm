@@ -84,6 +84,8 @@ def main():
     mean_average_precision = 0
     queries = 0
 
+    random_nums = [np.random.randint(0, len(features)) for i in range(2)]
+
     for feature in range(len(features)):
         if "query" not in name[feature]:
             continue
@@ -101,24 +103,25 @@ def main():
         keep = np.invert(np.char.startswith(name[rank], q_pid + '_' + q_camid))
         rank = rank[keep]
 
-        # #plot original image and top 10 similar images
-        # plt.figure(figsize=(20, 10))
-        # plt.subplot(1, 11, 1)
-        # plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/", name[feature] + '.jpg')), cv2.COLOR_BGR2RGB))
-        # plt.title("Query")
-        # print("Query: " + name[feature] + " Label: " + labels[feature])
-        # plt.axis('off')
-        # for i in range(10):
-        #     plt.subplot(1, 11, i+2)
-        #     plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/" , name[rank[i]] + '.jpg')), cv2.COLOR_BGR2RGB))
-        #     plt.axis('off')
-        #     print("Rank " + str(i+1) + ": " + name[rank[i]] + " Label: " + labels[rank[i]])
-        #     #color the correct rank
-        #     if labels[feature] == labels[rank[i]]:
-        #         plt.title("Rank " + str(i+1), color='green')
-        #     else:
-        #         plt.title("Rank " + str(i+1), color='red')
-        # plt.show()
+        if feature in random_nums:
+            #plot original image and top 10 similar images
+            plt.figure(figsize=(20, 10))
+            plt.subplot(1, 11, 1)
+            plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/", name[feature] + '.jpg')), cv2.COLOR_BGR2RGB))
+            plt.title("Query")
+            print("Query: " + name[feature] + " Label: " + labels[feature])
+            plt.axis('off')
+            for i in range(10):
+                plt.subplot(1, 11, i+2)
+                plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/" , name[rank[i]] + '.jpg')), cv2.COLOR_BGR2RGB))
+                plt.axis('off')
+                print("Rank " + str(i+1) + ": " + name[rank[i]] + " Label: " + labels[rank[i]])
+                #color the correct rank
+                if labels[feature] == labels[rank[i]]:
+                    plt.title("Rank " + str(i+1), color='green')
+                else:
+                    plt.title("Rank " + str(i+1), color='red')
+            plt.savefig('example_' + str(random_nums.index(feature)) + '.png')
 
         #calculate rank 1, 5, 10 accuracy
         rank_1 = rank[0:1]
