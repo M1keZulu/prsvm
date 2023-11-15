@@ -1,13 +1,12 @@
 "use client";
 
 import React from 'react'
-import Sidebar from './component/navbarandpanel.js'
-import Barchart from './component/barchart.js'
-import Navbar from './component/navbar.js'
+import Sidebar from '../component/navbarandpanel.js'
+import Barchart from '../component/barchart.js'
+import Navbar from '../component/navbar.js'
 import { Box, Toolbar, Typography,Grid } from '@mui/material'
-import Details from './component/details.js';
-
-export default function Home() {
+import Details from '../component/details.js';
+const Thismy = () => {
   return (
     <>
     <Navbar />
@@ -39,5 +38,9 @@ export default function Home() {
       </Grid>
     </Box>
   </>
+
+
   )
 }
+
+export default Thismy
