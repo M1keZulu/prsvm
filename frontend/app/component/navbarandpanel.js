@@ -2,28 +2,20 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import AppBar from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
-import { Menu, MenuItem } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import Avatar from '@mui/material/Avatar';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import { Dashboard } from '@mui/icons-material';
-import FolderSpecialIcon from '@mui/icons-material/FolderSpecial';
-import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
-import ImageSearchIcon from '@mui/icons-material/ImageSearch';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-
-//const drawerWidth = 240;
+import { ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import {
+  Dashboard,
+  FolderSpecial,
+  VideoCameraFront,
+  ImageSearch,
+  AccountTree,
+  Assessment
+} from '@mui/icons-material';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const panelItems = [
   {
@@ -33,77 +25,62 @@ const panelItems = [
   },
   {
     text: 'Incidents',
-    icon: <FolderSpecialIcon />,
-    path: '/'
+    icon: <FolderSpecial />,
+    path: '/incident'
   },
-
   {
     text: 'Videos',
-    icon: <VideoCameraFrontIcon />,
-    path: '/'
+    icon: <VideoCameraFront />,
+    path: '/video'
   },
-
   {
     text: 'Re-id',
-    icon: <ImageSearchIcon />,
-    path: '/'
+    icon: <ImageSearch />,
+    path: '/re-id'
   },
   {
     text: 'Results',
-    icon: <AccountTreeIcon />,
+    icon: <AccountTree />,
     path: '/'
   },
   {
     text: 'Reports',
-    icon: <AssessmentIcon />,
+    icon: <Assessment />,
     path: '/'
   },
-
-
 ];
-
-
 
 export default function ClippedDrawer() {
   
-
-  const drawerWidth = 240;
+  
   return (
     <Box display={'flex'}>
       <CssBaseline />
-     
       <Drawer
         variant="permanent"
         sx={{
-          width: drawerWidth,
+          width: 240,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box' },
         }}
       >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
-
-          <List>
+        <List>
             {panelItems.map((item) => (
-              <ListItem
-                key={item.text}
-                disablePadding
-              //onClick={() => history.push(item.path)}
-              // className={location.pathname == item.path ? classes.active : null}
-              >
-                <ListItemButton>
+              <Link href={item.path} key={item.text}>
+                <ListItemButton
+                
+                >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
                 </ListItemButton>
-              </ListItem>
+              </Link>
             ))}
           </List>
-
           <Divider />
-
         </Box>
       </Drawer>
-    
     </Box>
   );
 }
