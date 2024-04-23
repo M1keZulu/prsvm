@@ -17,6 +17,7 @@ def main():
     logging.info("Data path: " + data_path)
     logging.info("Features path: " + features_path)
 
+
     for file in os.listdir(data_path + '/query/'):
         if not file.endswith('.jpg') and not file.endswith('.png') and not file.endswith('.jpeg'):
             continue
