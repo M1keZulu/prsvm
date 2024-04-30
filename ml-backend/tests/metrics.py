@@ -17,12 +17,12 @@ def main():
     logging.info("Data path: " + data_path)
     logging.info("Features path: " + features_path)
 
+
     for file in os.listdir(data_path + '/query/'):
         if not file.endswith('.jpg') and not file.endswith('.png') and not file.endswith('.jpeg'):
             continue
         os.rename(data_path + '/query/' + file, data_path + '/gallery/' + file.split('.')[0] + '_query.jpg')
 
-    
     core = ov.Core()
     devices = core.get_available_devices()
     logging.info("Available devices: " + str(devices))
@@ -124,7 +124,7 @@ def main():
                     plt.title("Rank " + str(i+1), color='green')
                 else:
                     plt.title("Rank " + str(i+1), color='red')
-            plt.savefig('example_' + str(random_nums.index(feature)) + '.png')
+            plt.savefig('example_' + str(random_nums.index(feature)) + '.jpg')
 
         #calculate rank 1, 5, 10 accuracy
         rank_1 = rank[0:1]
