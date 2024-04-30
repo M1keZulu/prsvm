@@ -4,4 +4,3 @@
 ['remote "gdriveremote"']
     url = gdrive://1F4u-cg1O40DRwMieeLsq4QezK0TDAxX9
     gdrive_use_service_account = true
-    gdrive_service_account_json_file_path = /home/zain/prsvm/serviceAccount.json
