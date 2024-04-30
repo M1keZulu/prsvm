@@ -22,6 +22,7 @@ def main():
             continue
         os.rename(data_path + '/query/' + file, data_path + '/gallery/' + file.split('.')[0] + '_query.jpg')
 
+    
     core = ov.Core()
     devices = core.get_available_devices()
     logging.info("Available devices: " + str(devices))
