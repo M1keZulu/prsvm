@@ -1,0 +1,90 @@
+extends layout
+
+block content
+  .container
+    .pb-2.mt-2.mb-4.border-bottom
+      h2
+        | Cameras
+
+    .row
+        .col-md-6
+            form(role='form' method='POST', action='/cams/add')
+                input(type='hidden' name='_csrf', value=_csrf)
+                //add camera name
+                .form-group.mb-3
+                    label.col-form-label.font-weight-bold Camera Name
+                    .col-md-6
+                        input.form-control(type='text', name='name', id='camera_name', autocomplete='camera_name', required)
+                .form-group.mb-3
+                    label.col-form-label.font-weight-bold Camera Location
+                    .col-md-6
+                        input.form-control(type='text', name='location', id='camera_location', autocomplete='camera_location', required)
+                .form-group.mb-3
+                    label.col-form-label.font-weight-bold Camera Description
+                    .col-md-6
+                        input.form-control(type='text', name='description', id='camera_description', autocomplete='camera_description', required)
+                .form-group.mb-3
+                    label.col-form-label.font-weight-bold Camera Latitude
+                    .col-md-6
+                        input.form-control(type='text', name='latitude', id='camera_latitude', autocomplete='camera_latitude', required)
+                .form-group.mb-3
+                    label.col-form-label.font-weight-bold Camera Longitude
+                    .col-md-6
+                        input.form-control(type='text', name='longitude', id='camera_longitude', autocomplete='camera_longitude', required)
+                button.btn.btn-primary(type='submit')
+                    i.fas.fa-play.fa-sm.iconpadding
+                    | Add Camera
+        //show all camera locations
+        .col-md-6
+            each camera in cameras
+                .card.mb-4
+                    .card-header
+                        h5.card-title #{camera.name}
+                    .card-body
+                        p #{camera.location}
+                        p #{camera.description}
+                        p #{camera.latitude}
+                        p #{camera.longitude}
+
+                    .card-footer
+                        // Delete button
+                        form.d-flex.justify-content-end(action='/cams/delete', method='POST')
+                            input(type='hidden', name='_csrf', value=_csrf)
+                            input(type='hidden', name='cameraId', value=camera.id)
+                            button.btn.btn-danger(type='submit')
+                                i.fas.fa-trash.fa-sm.iconpadding
+                                | Delete
+
+    div#map(style='height: 500px;')
+
+    script.
+        //on load dom initialize map
+        document.addEventListener("DOMContentLoaded", function () {
+            //initialize map
+            var map = L.map('map').setView([24.856885, 427.264684], 20);
+            //add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 18,
+            }).addTo(map);
+
+            //get longitude and latitude when user clicks on map
+            function onMapClick(e) {
+                document.getElementById("camera_latitude").value = e.latlng.lat;
+                document.getElementById("camera_longitude").value = e.latlng.lng;
+            }
+
+            //add event listener to map
+            map.on('click', onMapClick);
+            
+            //get all cameras
+            var cameras = !{JSON.stringify(cameras)};
+
+            cameras.forEach(function(camera) {
+                //add marker to map
+                var marker = L.marker([camera.latitude, camera.longitude]).addTo(map);
+                //add popup to marker
+                marker.bindPopup("<b>" + camera.name + "</b><br>" + camera.location + "<br>" + camera.description).openPopup();
+            });
+
+        });

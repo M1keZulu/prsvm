@@ -1,0 +1,173 @@
+extends layout
+
+block content
+  .container
+    .pb-2.mt-2.mb-4.border-bottom
+      h2
+        | Incidents
+
+    .row
+      each incident in incidents
+        .col-md-6
+          .card.mb-4
+            .card-header
+              h5.card-title #{incident.name}
+              p.card-text #{incident.description}
+
+              // Query image
+              img.mt-3(src=incident.query_url, alt='Query Image' style='width: 100px;height:200px')
+              p
+              h5
+                if incident.job_status == 'finished'
+                    | Status: 
+                    i.fas.fa-check-circle.fa-sm.iconpadding
+                    | #{incident.job_status}
+                else if incident.job_status == 'started'
+                    | Status: 
+                    i.fas.fa-spinner.fa-sm.iconpadding
+                    | #{incident.job_status}
+                    | Progress: #{incident.progress}%
+                else
+                    | Status: 
+                    i.fas.fa-spinner.fa-sm.iconpadding
+                    | #{incident.job_status}
+            if incident.job_status == 'queued'
+                h5
+                    | Queue Position: #{incident.position}           
+            if incident.job_status == 'finished'
+              .card-body
+                // Video element
+                video.w-100(controls="")
+                  source(src=incident.url, type='video/mp4')
+                  
+              // button that sends incident id
+              button.btn.btn-primary(type='button', onclick='sendVideosDetected("' + incident.id + '")')
+                i.fas.fa-play.fa-sm.iconpadding
+                | View on Map
+            p
+            //collapsable div to view gallery images
+            .collapse.mt-3(id='collapseExample' + incident.id)
+              .card.card-body
+                each image in incident.images_list
+                  img.mt-3(src=incident.backend_url+"/gallery?image="+image, alt='Gallery Image')
+            
+            //button to toggle the collapse
+            button.btn.btn-primary(type='button', data-toggle='collapse', data-target='#collapseExample' + incident.id, aria-expanded='false', aria-controls='collapseExample' + incident.id)
+              i.fas.fa-images.fa-sm.iconpadding
+              | View Gallery
+
+            .card-footer
+              // Delete button
+              form.d-flex.justify-content-end(action='/incidents/delete', method='POST')
+                input(type='hidden', name='_csrf', value=_csrf)
+                input(type='hidden', name='incidentId', value=incident.id)
+                button.btn.btn-danger(type='submit')
+                  i.fas.fa-trash.fa-sm.iconpadding
+                  | Delete
+    //create a div with id map
+    div#map(style='height: 500px;')
+
+
+      .col-md-6
+        form.mb-4(role='form', enctype='multipart/form-data', method='POST')
+          input(type='hidden', name='_csrf', value=_csrf)
+          // Additional form elements here
+
+    script.
+        //on load dom initialize map
+        var map;
+        document.addEventListener("DOMContentLoaded", function () {
+            //initialize map
+            map = L.map('map').setView([24.856885, 427.264684], 20);
+            //add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 18,
+            }).addTo(map);
+
+            //get longitude and latitude when user clicks on map
+            function onMapClick(e) {
+                //alert("You clicked the map at " + e.latlng);
+                //set the value of the longitude and latitude in the form
+                //document.getElementById("longitude").value = e.latlng.lng;
+                //document.getElementById("latitude").value = e.latlng.lat;
+                console.log(e.latlng.lng);
+            }
+
+            //add event listener to map
+            map.on('click', onMapClick);
+        });
+
+        function sendVideosDetected(incident_id) {
+            //remove any existing heatmap
+            map.eachLayer(function (layer) {
+                if (layer instanceof L.HeatLayer) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            //get incidents
+            var incidents = !{JSON.stringify(incidents)};
+            var videos = !{JSON.stringify(videos)};
+            //get the incident
+            var incident = incidents.find(incident => incident.id === incident_id);
+            var videos_detected = incident.videos_detected;
+            
+            //for each key in videos_detected get camera and create heatmap data
+            var camData = [];
+            for (var key in videos_detected) {
+                var video = videos.find(video => video.name === key);
+                var camera = video.camera;
+
+                //check if camera is in camData
+                var cam = camData.find(cam => cam.name === camera.name);
+                if (cam) {
+                    cam.count += videos_detected[key];
+                } else {
+                    camData.push({
+                        name: camera.name,
+                        lat: camera.latitude,
+                        lng: camera.longitude,
+                        count: videos_detected[key],
+                        location: camera.location,
+                        description: camera.description
+                    });
+                }
+            }
+
+            //normalize count to 1 but keep the same ratio
+            var max = 0;
+            for (var i = 0; i < camData.length; i++) {
+                if (camData[i].count > max) {
+                    max = camData[i].count;
+                }
+            }
+            for (var i = 0; i < camData.length; i++) {
+                camData[i].count = camData[i].count / max;
+            }
+
+
+            //create heatmap data
+            var heatmapData = [];
+            for (var i = 0; i < camData.length; i++) {
+                heatmapData.push([camData[i].lat, camData[i].lng, camData[i].count]);
+            }
+
+            console.log(camData)
+
+            //create heatmap
+            var heatmapLayer = L.heatLayer(heatmapData, {
+                radius: 27, // Adjust radius as needed
+                blur: 10,   // Adjust blur as desired
+                // Customize colors and other options as needed
+            }).addTo(map);
+
+            //create markers
+            for (var i = 0; i < camData.length; i++) {
+                var marker = L.marker([camData[i].lat, camData[i].lng]).addTo(map);
+                marker.bindPopup("<b>" + camData[i].name + "</b><br>" + camData[i].location + "<br>" + camData[i].description);
+
+            }
+            
+
+        }

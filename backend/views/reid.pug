@@ -1,0 +1,271 @@
+extends layout
+
+block content
+    .pb-2.mt-2.mb-4.border-bottom
+        h2 Run Query
+    .row
+        .col-md-6
+            form(role='form' method='POST')
+                input(type='hidden' name='_csrf', value=_csrf)
+                label.col-form-label.font-weight-bold Name 
+                .col-md-6
+                    input.form-control(type='text', name='name', id='name', autocomplete='name', required)
+                label.col-form-label.font-weight-bold Description 
+                .col-md-6
+                    input.form-control(type='text', name='description', id='description', autocomplete='description', required)
+                .form-group.mb-3
+                    label.col-form-label.font-weight-bold Video Input
+                    .col-md-6
+                        select(name='video' id='video-select')
+                            option(value='') Select a video
+                            each video in videos
+                                option(value=video.url)= video.name
+
+            #selected-video-container
+                p No video selected yet.
+            button.btn.btn-primary(type='button' onclick='extractFrame()')
+                i.fas.fa-play.fa-sm.iconpadding
+                | Extract Frame
+            p
+            button.btn.btn-primary(type='button' onclick='sendCoordinates()')
+                i.fas.fa-play.fa-sm.iconpadding
+                | Run Query
+            p
+            canvas#cropCanvas
+
+        .div
+            input(type='hidden' name='_csrf', value=_csrf) 
+            input(name='height', id='height', type='hidden')
+            input(name='width', id='width', type='hidden')
+            input(name='x', id='x', type='hidden')
+            input(name='y', id='y', type='hidden')
+            .modal.fade(id='cropModal', tabindex='-1', role='dialog', aria-labelledby='cropModalLabel', aria-hidden='true')
+                .modal-dialog(role='document')
+                    .modal-content
+                        .modal-header
+                            h5.modal-title#cropModalLabel Select Region of Interest
+                            button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                span(aria-hidden='true') &times;
+                        .modal-body
+                            canvas#frame
+                        .modal-footer
+                            button.btn.btn-secondary(type='button', onClick='closeModal()') Close
+
+        script.
+            document.addEventListener("DOMContentLoaded", function () {
+                const videoSelect = document.getElementById('video-select');
+                const selectedVideoContainer = document.getElementById('selected-video-container');
+
+                videoSelect.addEventListener('change', function () {
+                const selectedIndex = this.selectedIndex;
+                const selectedOption = this.options[selectedIndex];
+                const videoUrl = selectedOption.value;
+                const videoName = selectedOption.textContent;
+
+                if (videoUrl) {
+                    const element = document.createElement('div')
+
+                    element.innerHTML = '<video width="100%" controls><source src="' + videoUrl + '" type="video/mp4"></video>';
+
+
+                    const listItem = document.createElement('div');
+                    listItem.classList.add('list-group-item');
+                    const heading = document.createElement('h4');
+                    heading.classList.add('list-group-item-heading');
+                    heading.textContent = videoName;
+
+                    listItem.appendChild(heading);
+
+                    selectedVideoContainer.innerHTML = '';
+                    selectedVideoContainer.appendChild(element);
+                    selectedVideoContainer.appendChild(listItem);
+                } else {
+                    selectedVideoContainer.innerHTML = '<p>No video selected yet.</p>';
+                }
+                });                
+
+                const canvas = document.getElementById('frame');
+                const context = canvas.getContext('2d');
+
+                let isDrawing = false;
+                let startX, startY, rect = {};
+
+                canvas.addEventListener('mousedown', function (event) {
+                    isDrawing = true;
+                    startX = event.offsetX
+                    startY = event.offsetY;
+                    rect = { x: startX, y: startY, width: 0, height: 0 };
+                });
+
+                canvas.addEventListener('mousemove', function (event) {
+                    if (isDrawing) {
+                    rect.width = event.offsetX - startX;
+                    rect.height = event.offsetY - startY;
+                    drawRectangle(context, rect);
+                    }
+                });
+
+                canvas.addEventListener('mouseup', function (event) {
+                    isDrawing = false;                    
+                    const height = document.getElementById('height');
+                    const width = document.getElementById('width');
+                    const x = document.getElementById('x');
+                    const y = document.getElementById('y');
+                    height.value = rect.height;
+                    width.value = rect.width;
+                    x.value = rect.x;
+                    y.value = rect.y;
+                    
+                    //draw cropped frame on cropCanvas
+                    const cropCanvas = document.getElementById('cropCanvas');
+                    const cropContext = cropCanvas.getContext('2d');
+                    const video = document.querySelector('video');
+                    const videoWidth = video.videoWidth;
+                    const videoHeight = video.videoHeight;
+                    cropCanvas.width = rect.width;
+                    cropCanvas.height = rect.height;
+                    cropContext.drawImage(video, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
+
+                });
+
+                function drawRectangle(context, rect) {
+                    const video = document.querySelector('video');
+                    const videoWidth = video.videoWidth;
+                    const videoHeight = video.videoHeight;
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    //border of rectangle red
+                    context.strokeStyle = 'red';
+                    context.drawImage(video, 0, 0, videoWidth, videoHeight); // Re-draw the video frame
+                    context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                }
+            });
+
+                function extractFrame() {
+                    const video = document.querySelector('video');
+                    const canvas = document.getElementById('frame');
+                    const context = canvas.getContext('2d');
+
+                    // Check if video is available
+                    if (!video) {
+                        return;
+                    }
+
+                    // Pause the video before capturing the frame
+                    video.pause();
+
+                    // Get video dimensions
+                    const videoWidth = video.videoWidth;
+                    const videoHeight = video.videoHeight;
+
+                    //set canvas to fixed size and fit frame
+                    canvas.width = videoWidth;
+                    canvas.height = videoHeight;
+
+                    // Draw the current video frame onto the canvas
+                    context.drawImage(video, 0, 0, videoWidth, videoHeight);        
+
+                    //style modal to show full canvas
+                    const modalDialog = document.querySelector('.modal-dialog');
+                    modalDialog.style.maxWidth = '100%';
+                    modalDialog.style.width = '100%';
+                    modalDialog.style.height = '100%';
+                    modalDialog.style.margin = '0';
+
+                    //show modal
+                    $('#cropModal').modal('show');
+                }
+
+                function sendCoordinates(){
+                    const height = document.getElementById('height');
+                    const width = document.getElementById('width');
+                    const x = document.getElementById('x');
+                    const y = document.getElementById('y');
+                    const video = document.querySelector('video');
+                    const videoSelect = document.getElementById('video-select');
+                    const selectedIndex = videoSelect.selectedIndex;
+                    const selectedOption = videoSelect.options[selectedIndex];
+                    const name = document.getElementById('name');
+                    const description = document.getElementById('description');
+                    
+                    const videoName = selectedOption.textContent;
+                    const videoUrl = selectedOption.value;
+                    const heightVal = height.value;
+                    const widthVal = width.value;
+                    const xVal = x.value;
+                    const yVal = y.value;
+
+                    const data = {
+                        name : name.value,
+                        description: description.value,
+                        videoName: videoName,
+                        height: heightVal,
+                        width: widthVal,
+                        x: xVal,
+                        y: yVal
+                    };
+
+                    //submit form to server with csrf token
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/query';
+                    form.style.visibility = 'hidden';
+                    //get csrf token
+                    const csrf = document.querySelector('input[name="_csrf"]').value;
+                    const csrfInput = document.createElement('input');
+                    csrfInput.name = '_csrf';
+                    csrfInput.value = csrf;
+                    form.appendChild(csrfInput);
+                    //get video name
+
+                    const nameInput = document.createElement('input');
+                    nameInput.name = 'name';
+                    nameInput.value = name.value;
+                    form.appendChild(nameInput);
+
+                    const descriptionInput = document.createElement('input');
+                    descriptionInput.name = 'description';
+                    descriptionInput.value = description.value;
+                    form.appendChild(descriptionInput);
+
+                    const videoNameInput = document.createElement('input');
+                    videoNameInput.name = 'videoName';
+                    videoNameInput.value = videoName;
+                    form.appendChild(videoNameInput);
+
+                    const timestampInput = document.createElement('input');
+                    timestampInput.name = 'timestamp';
+                    timestampInput.value = video.currentTime;
+                    form.appendChild(timestampInput);
+
+                    //get height
+                    const heightInput = document.createElement('input');
+                    heightInput.name = 'height';
+                    heightInput.value = heightVal;
+                    form.appendChild(heightInput);
+                    //get width
+                    const widthInput = document.createElement('input');
+                    widthInput.name = 'width';
+                    widthInput.value = widthVal;
+                    form.appendChild(widthInput);
+                    //get x
+                    const xInput = document.createElement('input');
+                    xInput.name = 'x';
+                    xInput.value = xVal;
+                    form.appendChild(xInput);
+                    //get y
+                    const yInput = document.createElement('input');
+                    yInput.name = 'y';
+                    yInput.value = yVal;
+                    form.appendChild(yInput);
+
+                    document.body.appendChild(form);
+
+
+                    form.submit();
+                }
+
+                function closeModal(){
+                    $('#cropModal').modal('hide');
+                }
+
+                
