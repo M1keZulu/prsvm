@@ -7,6 +7,8 @@ on:
       - 'ml-backend/data/**'
       - 'ml-backend/models/**'
       - 'ml-backend/tests/**'
+      - 'ml-backend/data.dvc'
+      - 'ml-backend/models.dvc'
 jobs:
   model_test:
     runs-on: ubuntu-latest
