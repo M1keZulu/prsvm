@@ -30,9 +30,13 @@ def saveFeatures(video_folder_path):
         video_path = os.path.join(video_folder_path, video)
         cap = cv2.VideoCapture(video_path)
         pbar = tqdm.tqdm(total=cap.get(cv2.CAP_PROP_FRAME_COUNT), desc=video)
+        #get video fps
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        print("FPS: ", fps)
         while True:
             ret, frame = cap.read()
-            pbar.update(1)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, cap.get(cv2.CAP_PROP_POS_FRAMES) + fps)
+            pbar.update(fps)
             if not ret:
                 break
             if ret and frame is not None and frame.size!=0:
@@ -237,10 +241,10 @@ def searchQuery(compare_image_path, video_folder_path, threshold=0.5):
 
 
 if __name__ == '__main__':
-    detection_model_xml = "./models/person-detection-retail-0013/FP16/person-detection-retail-0013.xml"
-    detection_model_bin = "./models/person-detection-retail-0013/FP16/person-detection-retail-0013.bin"
-    reid_model_xml = "./models/person-reidentification-retail-0277/FP16/person-reidentification-retail-0277.xml"
-    reid_model_bin = "./models/person-reidentification-retail-0277/FP16/person-reidentification-retail-0277.bin"
+    detection_model_xml = "/Users/zain/prsvm/ml-backend/flask/person-detection-retail-0013/FP16-INT8/person-detection-retail-0013.xml"
+    detection_model_bin = "/Users/zain/prsvm/ml-backend/flask/person-detection-retail-0013/FP16-INT8/person-detection-retail-0013.bin"
+    reid_model_xml = "/Users/zain/Downloads/Person_ReID_Testing/dataset-generation-tool/models/person-reidentification-retail-0277/FP16/person-reidentification-retail-0277.xml"
+    reid_model_bin = "/Users/zain/Downloads/Person_ReID_Testing/dataset-generation-tool/models/person-reidentification-retail-0277/FP16/person-reidentification-retail-0277.bin"
 
     ie = IECore()
 
@@ -263,7 +267,7 @@ if __name__ == '__main__':
     reid_exec_net = ie.load_network(network=reid_net, device_name="CPU")
 
     #Example usage
-    #searchQuery("/Users/zain/Desktop/Screenshots/Screenshot 2023-06-16 at 7.25.22 AM.png", "/Users/zain/Desktop/PersonReID_Prototype/campus_videos")
-    #saveFeatures("/Users/zain/Desktop/PersonReID_Prototype/campus_videos")
-    #searchFeatures("/Users/zain/Desktop/Screenshots/Screenshot 2023-06-16 at 7.25.22 AM.png", "/Users/zain/prsvm/dataset-generation-tool/features", "/Users/zain/prsvm/dataset-generation-tool/gallery")
-    #createClusters("./features", "./gallery", 10)
+    #searchQuery("/Users/zain/Desktop/Screenshots/Screenshot 2023-11-21 at 6.51.40 PM.png", "/Users/zain/prsvm/ml-backend/flask/database/Walking_3_Backyard.mp4")
+    #saveFeatures("/Users/zain/Downloads/FYP_Dataset/videos")
+    searchFeatures("/Users/zain/Desktop/Screenshots/Screenshot 2024-04-21 at 6.17.19 PM.png", "/Users/zain/prsvm/dataset-generation-tool/features", "/Users/zain/prsvm/dataset-generation-tool/gallery")
+    #createClusters("./features", "./gallery", 50)

@@ -17,10 +17,11 @@ def main():
     logging.info("Data path: " + data_path)
     logging.info("Features path: " + features_path)
 
+
     for file in os.listdir(data_path + '/query/'):
         if not file.endswith('.jpg') and not file.endswith('.png') and not file.endswith('.jpeg'):
             continue
-        os.rename(data_path + '/query/' + file, data_path + '/gallery/' + file.split('.')[0] + '_query.jpg')
+        os.rename(data_path + '/query/' + file, data_path + '/gallery/' + file.split('.')[0] + '_query.png')
 
     core = ov.Core()
     devices = core.get_available_devices()
@@ -109,13 +110,13 @@ def main():
             #plot original image and top 10 similar images
             plt.figure(figsize=(20, 10))
             plt.subplot(1, 11, 1)
-            plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/", name[feature] + '.jpg')), cv2.COLOR_BGR2RGB))
+            plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/", name[feature] + '.png')), cv2.COLOR_BGR2RGB))
             plt.title("Query")
             print("Query: " + name[feature] + " Label: " + labels[feature])
             plt.axis('off')
             for i in range(10):
                 plt.subplot(1, 11, i+2)
-                plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/" , name[rank[i]] + '.jpg')), cv2.COLOR_BGR2RGB))
+                plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(data_path + "/gallery/" , name[rank[i]] + '.png')), cv2.COLOR_BGR2RGB))
                 plt.axis('off')
                 print("Rank " + str(i+1) + ": " + name[rank[i]] + " Label: " + labels[rank[i]])
                 #color the correct rank
